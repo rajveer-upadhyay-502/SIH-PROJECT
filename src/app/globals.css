@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+
+/* Light & Dark Theme Variables */
 :root {
   --background: 255 255 255;
   --foreground: 23 23 23;
@@ -12,17 +14,23 @@
   }
 }
 
+/* Apply Global Styles to Body */
 body {
   background-color: rgb(var(--background));
   color: rgb(var(--foreground));
   font-family: system-ui, sans-serif;
 }
 
-.theme-inline {
-  --animate-cell-ripple: cell-ripple var(--duration, 200ms) ease-out both 1 var(--delay, 0ms);
-  animation: var(--animate-cell-ripple);
+/* Custom Utility Layer */
+@layer utilities {
+  .theme-inline {
+    --animate-cell-ripple: cell-ripple var(--duration, 200ms) ease-out both 1 var(--delay, 0ms);
+    animation: var(--animate-cell-ripple);
+  }
 }
 
+
+/* Ripple Animation Keyframes */
 @keyframes cell-ripple {
   0% {
     opacity: 0.4;

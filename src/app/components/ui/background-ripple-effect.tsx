@@ -3,9 +3,9 @@ import React, { useMemo, useRef, useState } from "react";
 import { cn } from "@/app/lib/utils";
 
 export const BackgroundRippleEffect = ({
-  rows = 8,
-  cols = 27,
-  cellSize = 56,
+  rows = 20,
+  cols = 29,
+  cellSize = 54,
 }: {
   rows?: number;
   cols?: number;
@@ -22,13 +22,14 @@ export const BackgroundRippleEffect = ({
     <div
       ref={ref}
       className={cn(
-        "absolute inset-0 h-full w-full",
+        // 🔥 FULL SCREEN
+        "fixed top-0 left-0 w-screen h-screen z-0",
         "[--cell-border-color:var(--color-neutral-300)] [--cell-fill-color:var(--color-neutral-100)] [--cell-shadow-color:var(--color-neutral-500)]",
-        "dark:[--cell-border-color:var(--color-neutral-700)] dark:[--cell-fill-color:var(--color-neutral-900)] dark:[--cell-shadow-color:var(--color-neutral-800)]",
+        "dark:[--cell-border-color:var(--color-neutral-700)] dark:[--cell-fill-color:var(--color-neutral-900)] dark:[--cell-shadow-color:var(--color-neutral-800)]"
       )}
     >
-      <div className="relative h-auto w-auto overflow-hidden">
-        <div className="pointer-events-none absolute inset-0 z-[2] h-full w-full overflow-hidden" />
+      <div className="relative h-full w-full overflow-hidden">
+        <div className="pointer-events-none absolute inset-0 z-[2] h-full w-full" />
         <DivGrid
           key={`base-${rippleKey}`}
           className="mask-radial-from-20% mask-radial-at-top opacity-600"
@@ -53,7 +54,7 @@ type DivGridProps = {
   className?: string;
   rows: number;
   cols: number;
-  cellSize: number; // in pixels
+  cellSize: number;
   borderColor: string;
   fillColor: string;
   clickedCell: { row: number; col: number } | null;
@@ -79,7 +80,7 @@ const DivGrid = ({
 }: DivGridProps) => {
   const cells = useMemo(
     () => Array.from({ length: rows * cols }, (_, idx) => idx),
-    [rows, cols],
+    [rows, cols]
   );
 
   const gridStyle: React.CSSProperties = {
@@ -99,8 +100,8 @@ const DivGrid = ({
         const distance = clickedCell
           ? Math.hypot(clickedCell.row - rowIdx, clickedCell.col - colIdx)
           : 0;
-        const delay = clickedCell ? Math.max(0, distance * 55) : 0; // ms
-        const duration = 200 + distance * 80; // ms
+        const delay = clickedCell ? Math.max(0, distance * 55) : 0;
+        const duration = 200 + distance * 80;
 
         const style: CellStyle = clickedCell
           ? {
@@ -114,8 +115,8 @@ const DivGrid = ({
             key={idx}
             className={cn(
               "cell relative border-[0.5px] opacity-40 transition-opacity duration-150 will-change-transform hover:opacity-80 dark:shadow-[0px_0px_40px_1px_var(--cell-shadow-color)_inset]",
-              clickedCell && "animate-cell-ripple [animation-fill-mode:none]",
-              !interactive && "pointer-events-none",
+              clickedCell && "theme-inline",
+              !interactive && "pointer-events-none"
             )}
             style={{
               backgroundColor: fillColor,
