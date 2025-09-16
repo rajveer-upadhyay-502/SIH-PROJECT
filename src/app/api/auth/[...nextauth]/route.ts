@@ -1,9 +1,13 @@
+// app/api/auth/[...nextauth]/route.ts
 import NextAuth, { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-import { MongoDBAdapter } from "@next-auth/mongodb-adapter";
-import clientPromise from "@/app/lib/db";
-import { connectToDatabase } from "@/app/lib/db";
-import User from "@/app/lib/models/User";
+import { db } from "@/app/lib/db";
+import {
+  collection,
+  query,
+  where,
+  getDocs,
+} from "firebase/firestore";
 import bcrypt from "bcrypt";
 
 type Credentials = {
@@ -16,46 +20,39 @@ interface AuthUser {
   name: string;
   email: string;
   role: "ADMIN" | "TEACHER" | "STUDENT";
-  institutionId: string; // must always be string
+  institutionId: string;
 }
 
 export const authOptions: NextAuthOptions = {
-  adapter: MongoDBAdapter(clientPromise),
-
   providers: [
     CredentialsProvider({
       name: "Credentials",
       credentials: {
-        email: { label: "Email", type: "email", placeholder: "your-email@example.com" },
+        email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" },
       },
 
       async authorize(credentials: Credentials | undefined): Promise<AuthUser | null> {
         if (!credentials?.email || !credentials?.password) return null;
 
-        await connectToDatabase();
+        const usersRef = collection(db, "users");
+        const q = query(usersRef, where("email", "==", credentials.email));
+        const querySnapshot = await getDocs(q);
 
-        const user = await User.findOne({ email: credentials.email });
-        if (!user) return null;
+        if (querySnapshot.empty) return null;
+
+        const doc = querySnapshot.docs[0];
+        const user = doc.data();
 
         const isValid = await bcrypt.compare(credentials.password, user.hashedPassword);
         if (!isValid) return null;
 
-        // Cast user.toObject to expected shape
-        const userObj = user.toObject() as {
-          _id: { toString: () => string };
-          name: string;
-          email: string;
-          role: "ADMIN" | "TEACHER" | "STUDENT";
-          institutionId?: { toString: () => string } | null;
-        };
-
         const cleanUser: AuthUser = {
-          id: userObj._id.toString(),
-          name: userObj.name,
-          email: userObj.email,
-          role: userObj.role,
-          institutionId: userObj.institutionId ? userObj.institutionId.toString() : "",
+          id: doc.id,
+          name: user.name,
+          email: user.email,
+          role: user.role,
+          institutionId: user.institutionId || "",
         };
 
         return cleanUser;

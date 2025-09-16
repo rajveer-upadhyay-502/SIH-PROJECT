@@ -1,6 +1,6 @@
 import mongoose, { Schema, model, models } from "mongoose";
 
-const UserSchema = new Schema(
+const TeacherSchema = new Schema(
   {
     name: { type: String, required: true },
     email: { type: String, required: true, unique: true },
@@ -8,11 +8,13 @@ const UserSchema = new Schema(
     role: {
       type: String,
       enum: ["ADMIN", "TEACHER", "STUDENT"],
-      default: "STUDENT",
+      default: "TEACHER",
     },
     institutionId: { type: Schema.Types.ObjectId, ref: "Institution", required: true },
+    department: { type: String }, // Optional field for department
+    phone: { type: String }, // Optional contact number
   },
   { timestamps: true }
 );
 
-export default models.User || model("User", UserSchema);
+export default models.Teacher || model("Teacher", TeacherSchema);
