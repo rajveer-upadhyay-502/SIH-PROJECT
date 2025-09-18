@@ -6,7 +6,7 @@ export default function RegisterCollegePage() {
     <>
       <NavbarDemo />
       <div className="min-h-screen flex items-center justify-center">
-        <CollegeRegisterForm />
+      <CollegeRegisterForm />
       </div>
     </>
   );
