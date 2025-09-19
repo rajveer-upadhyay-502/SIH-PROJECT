@@ -12,7 +12,7 @@ export default function HomePage() {
     <>
       <BackgroundRippleEffect />
       <div className="relative z-10">
-        <NavbarDemo />
+        
         <div className="mt-25 text-center py-20 px-4">
           <h1 className="text-4xl md:text-5xl font-bold mb-4">
             Welcome to EduManage
@@ -26,7 +26,7 @@ export default function HomePage() {
           <div className="mt-10 inline-block w-full max-w-lg">
             <Button
               duration={4000}
-              className="w-full px-7 "
+              className="w-full px-7 font-serif cursor-pointer"
               onClick={() => router.push("/login")}
             >
               Generate Timetable Now!

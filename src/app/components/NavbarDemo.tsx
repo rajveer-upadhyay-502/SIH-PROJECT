@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/app/context/AuthContext";
 
 import {
   Navbar,
@@ -16,13 +18,22 @@ import {
 } from "@/app/components/ui/resizable-navbar";
 
 export function NavbarDemo() {
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { user, logout } = useAuth();
+  const router = useRouter();
+
   const navItems = [
     { name: "Home", link: "/" },
     { name: "About", link: "#" },
     { name: "Contact Us", link: "#" },
   ];
 
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  // Logout handler: clear session and redirect
+  const handleLogout = () => {
+    logout();
+    router.push("/");
+    setIsMobileMenuOpen(false);
+  };
 
   return (
     <div className="relative w-full">
@@ -31,9 +42,25 @@ export function NavbarDemo() {
         <NavBody>
           <NavbarLogo />
           <NavItems items={navItems} />
+
           <div className="flex items-center gap-4">
-            <NavbarButton variant="secondary" href="/login">Login</NavbarButton>
-            <NavbarButton variant="primary" href="/register/user">Register</NavbarButton>
+            {!user ? (
+              <>
+                <NavbarButton variant="secondary" href="/login">
+                  Login
+                </NavbarButton>
+                <NavbarButton variant="primary" href="/college">
+                  Register
+                </NavbarButton>
+              </>
+            ) : (
+              <button
+                onClick={handleLogout}
+                className="bg-white text-black font-bold py-2 px-4 rounded hover:bg-white-700 cursor-pointer"
+              >
+                Logout
+              </button>
+            )}
           </div>
         </NavBody>
 
@@ -63,22 +90,34 @@ export function NavbarDemo() {
             ))}
 
             <div className="flex w-full flex-col gap-4 mt-4">
-              <NavbarButton
-                onClick={() => setIsMobileMenuOpen(false)}
-                variant="primary"
-                className="w-full"
-                href="/login"
-              >
-                Login
-              </NavbarButton>
-              <NavbarButton
-                onClick={() => setIsMobileMenuOpen(false)}
-                variant="primary"
-                className="w-full"
-                href="/register/user"
-              >
-                Register
-              </NavbarButton>
+              {!user ? (
+                <>
+                  <NavbarButton
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    variant="primary"
+                    className="w-full"
+                    href="/login"
+                  >
+                    Login
+                  </NavbarButton>
+                  <NavbarButton
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    variant="primary"
+                    className="w-full"
+                    href="/college"
+                  >
+                    Register
+                  </NavbarButton>
+                </>
+              ) : (
+                <NavbarButton
+                  onClick={handleLogout} 
+                  variant="primary"
+                  className="w-full"
+                >
+                  Logout
+                </NavbarButton>
+              )}
             </div>
           </MobileNavMenu>
         </MobileNav>

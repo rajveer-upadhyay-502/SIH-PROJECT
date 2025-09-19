@@ -11,7 +11,6 @@ import {
 import React, { useRef, useState } from "react";
 import Image from "next/image";
 
-
 interface NavbarProps {
   children: React.ReactNode;
   className?: string;
@@ -58,6 +57,7 @@ export const Navbar = ({ children, className }: NavbarProps) => {
   });
   const [visible, setVisible] = useState<boolean>(false);
 
+  // Correct: Call hook at top level, not inside useEffect
   useMotionValueEvent(scrollY, "change", (latest) => {
     if (latest > 100) {
       setVisible(true);
@@ -122,6 +122,7 @@ export const NavItems = ({ items, className, onItemClick }: NavItemsProps) => {
       onMouseLeave={() => setHovered(null)}
       className={cn(
         "absolute inset-0 hidden flex-1 flex-row items-center justify-center space-x-2 text-sm font-medium text-zinc-600 transition duration-200 hover:text-zinc-800 lg:flex lg:space-x-2",
+        "pointer-events-none", // <-- Prevent container from blocking clicks
         className,
       )}
     >
@@ -129,7 +130,7 @@ export const NavItems = ({ items, className, onItemClick }: NavItemsProps) => {
         <a
           onMouseEnter={() => setHovered(idx)}
           onClick={onItemClick}
-          className="relative px-4 py-2 text-neutral-600 dark:text-neutral-300"
+          className="relative px-4 py-2 text-neutral-600 dark:text-neutral-300 pointer-events-auto" // <-- Allow clicks on links
           key={`link-${idx}`}
           href={item.link}
         >
@@ -231,7 +232,6 @@ export const MobileNavToggle = ({
   );
 };
 
-
 export const NavbarLogo = () => {
   return (
     <a
@@ -249,6 +249,7 @@ export const NavbarLogo = () => {
     </a>
   );
 };
+
 export const NavbarButton = ({
   href,
   as: Tag = "a",

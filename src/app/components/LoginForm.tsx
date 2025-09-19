@@ -3,9 +3,11 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { useAuth } from "../context/AuthContext"; // ⬅️ make sure this path is correct
 
 export default function LoginForm() {
   const router = useRouter();
+  const { login } = useAuth(); // ⬅️ Grab login method from context
 
   const [formData, setFormData] = useState({
     email: "",
@@ -36,9 +38,12 @@ export default function LoginForm() {
       const data = await res.json();
 
       if (res.ok) {
+        // Save user to context + sessionStorage
+        login({ name: data.name || "Admin", email: formData.email });
+
         setMessage("✅ Login successful!");
         setTimeout(() => {
-          router.push("/dashboard"); // 🔁 redirect here
+          router.push("/dashboard");
         }, 1000);
       } else {
         setMessage(`❌ ${data.error || "Invalid credentials."}`);
@@ -81,7 +86,7 @@ export default function LoginForm() {
       <button
         type="submit"
         disabled={loading}
-        className="w-full bg-green-600 py-3 rounded hover:bg-green-700 transition-colors disabled:opacity-50"
+        className="w-full bg-green-600 py-3 rounded hover:bg-green-700 transition-colors disabled:opacity-50 cursor-pointer"
       >
         {loading ? "Logging in..." : "Login"}
       </button>
@@ -99,7 +104,7 @@ export default function LoginForm() {
       <p className="mt-6 text-sm text-center text-gray-400">
         New to EduManage?{" "}
         <Link
-          href="/register/user"
+          href="/college"
           className="text-blue-400 hover:underline hover:text-blue-300"
         >
           Register now

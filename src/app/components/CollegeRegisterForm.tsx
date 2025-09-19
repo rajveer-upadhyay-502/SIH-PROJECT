@@ -1,8 +1,11 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function CollegeRegisterForm() {
+  const router = useRouter();
+
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -14,16 +17,13 @@ export default function CollegeRegisterForm() {
     pincode: "",
     totalClassrooms: "",
     totalLabs: "",
-    password: "",
   });
 
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -32,16 +32,17 @@ export default function CollegeRegisterForm() {
     setMessage("");
 
     try {
-      const res = await fetch("/api/register/college", {
+      const response = await fetch("/api/college", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });
 
-      const data = await res.json();
+      const data = await response.json();
 
-      if (res.ok) {
+      if (response.ok) {
         setMessage("✅ College registered successfully!");
+
         setFormData({
           name: "",
           email: "",
@@ -53,14 +54,15 @@ export default function CollegeRegisterForm() {
           pincode: "",
           totalClassrooms: "",
           totalLabs: "",
-          password: "",
         });
+
+        // Redirect to admin register page with collegeId
+        router.push(`/admin/register?collegeId=${data.collegeId}`);
       } else {
-        setMessage(`❌ ${data.error || "Something went wrong."}`);
+        setMessage(`❌ ${data.error || "Failed to register college."}`);
       }
-    } catch (err) {
-      console.error(err);
-      setMessage("❌ Network error");
+    } catch {
+      setMessage("❌ Network error.");
     } finally {
       setLoading(false);
     }
@@ -69,13 +71,11 @@ export default function CollegeRegisterForm() {
   return (
     <form
       onSubmit={handleSubmit}
-      className="max-w-md mx-auto space-y-4 p-4 border rounded shadow-md"
+      className="max-w-md mx-auto space-y-4 p-4 border rounded shadow bg-grey-600"
     >
-      <h2 className="text-2xl font-semibold text-center">College Registration</h2>
+      <h2 className="text-2xl font-semibold text-center">Register College</h2>
 
-      {/* Name */}
       <input
-        type="text"
         name="name"
         placeholder="College Name"
         value={formData.name}
@@ -83,8 +83,6 @@ export default function CollegeRegisterForm() {
         required
         className="w-full p-2 border rounded"
       />
-
-      {/* Email */}
       <input
         type="email"
         name="email"
@@ -94,10 +92,7 @@ export default function CollegeRegisterForm() {
         required
         className="w-full p-2 border rounded"
       />
-
-      {/* Phone */}
       <input
-        type="tel"
         name="phone"
         placeholder="Contact Phone"
         value={formData.phone}
@@ -105,10 +100,7 @@ export default function CollegeRegisterForm() {
         required
         className="w-full p-2 border rounded"
       />
-
-      {/* Address */}
       <input
-        type="text"
         name="address"
         placeholder="Address"
         value={formData.address}
@@ -116,10 +108,7 @@ export default function CollegeRegisterForm() {
         required
         className="w-full p-2 border rounded"
       />
-
-      {/* City */}
       <input
-        type="text"
         name="city"
         placeholder="City"
         value={formData.city}
@@ -127,10 +116,7 @@ export default function CollegeRegisterForm() {
         required
         className="w-full p-2 border rounded"
       />
-
-      {/* State */}
       <input
-        type="text"
         name="state"
         placeholder="State"
         value={formData.state}
@@ -138,10 +124,7 @@ export default function CollegeRegisterForm() {
         required
         className="w-full p-2 border rounded"
       />
-
-      {/* Country */}
       <input
-        type="text"
         name="country"
         placeholder="Country"
         value={formData.country}
@@ -149,10 +132,7 @@ export default function CollegeRegisterForm() {
         required
         className="w-full p-2 border rounded"
       />
-
-      {/* Pincode */}
       <input
-        type="text"
         name="pincode"
         placeholder="Pin Code"
         value={formData.pincode}
@@ -160,52 +140,36 @@ export default function CollegeRegisterForm() {
         required
         className="w-full p-2 border rounded"
       />
-
-      {/* Total Classrooms */}
       <input
         type="number"
         name="totalClassrooms"
         placeholder="Total Classrooms"
         value={formData.totalClassrooms}
         onChange={handleChange}
-        required
         min={0}
+        required
         className="w-full p-2 border rounded"
       />
-
-      {/* Total Labs */}
       <input
         type="number"
         name="totalLabs"
         placeholder="Total Labs"
         value={formData.totalLabs}
         onChange={handleChange}
-        required
         min={0}
-        className="w-full p-2 border rounded"
-      />
-
-      {/* Password */}
-      <input
-        type="password"
-        name="password"
-        placeholder="Password"
-        value={formData.password}
-        onChange={handleChange}
         required
         className="w-full p-2 border rounded"
       />
 
-      {/* Submit */}
       <button
         type="submit"
         disabled={loading}
-        className="w-full bg-green-600 text-white py-2 rounded hover:bg-green-700"
+        className="w-full bg-green-600 text-white py-2 rounded hover:bg-green-700 cursor-pointer"
       >
         {loading ? "Registering..." : "Register College"}
       </button>
 
-      {message && <p className="mt-2 text-sm text-center">{message}</p>}
+      {message && <p className="text-center mt-2">{message}</p>}
     </form>
   );
 }
