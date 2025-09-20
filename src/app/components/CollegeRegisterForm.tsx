@@ -71,9 +71,9 @@ export default function CollegeRegisterForm() {
   return (
     <form
       onSubmit={handleSubmit}
-      className="max-w-md mx-auto space-y-4 p-4 border rounded shadow bg-grey-600"
+      className="max-w-md mx-auto space-y-4 p-6 border border-gray-700 rounded-lg shadow-lg bg-gray-900 text-white"
     >
-      <h2 className="text-2xl font-semibold text-center">Register College</h2>
+      <h2 className="text-2xl font-semibold text-center text-green-500 font-serif">Register College</h2>
 
       <input
         name="name"

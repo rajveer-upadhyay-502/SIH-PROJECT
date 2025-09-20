@@ -24,8 +24,8 @@ export function NavbarDemo() {
 
   const navItems = [
     { name: "Home", link: "/" },
-    { name: "About", link: "#" },
-    { name: "Contact Us", link: "#" },
+    { name: "About", link: "/aboutus" },
+    { name: "Contact Us", link: "/contact" },
   ];
 
   // Logout handler: clear session and redirect
