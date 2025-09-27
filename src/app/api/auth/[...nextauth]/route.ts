@@ -1,14 +1,9 @@
 // app/api/auth/[...nextauth]/route.ts
 import NextAuth, { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-import { db } from "@/app/lib/db";
-import {
-  collection,
-  query,
-  where,
-  getDocs,
-} from "firebase/firestore";
 import bcrypt from "bcrypt";
+import { connectToDatabase } from "@/app/lib/db";
+import { ObjectId } from "mongodb";
 
 type Credentials = {
   email?: string;
@@ -35,20 +30,17 @@ export const authOptions: NextAuthOptions = {
       async authorize(credentials: Credentials | undefined): Promise<AuthUser | null> {
         if (!credentials?.email || !credentials?.password) return null;
 
-        const usersRef = collection(db, "users");
-        const q = query(usersRef, where("email", "==", credentials.email));
-        const querySnapshot = await getDocs(q);
+        const { db } = await connectToDatabase();
 
-        if (querySnapshot.empty) return null;
+        const user = await db.collection("users").findOne({ email: credentials.email });
 
-        const doc = querySnapshot.docs[0];
-        const user = doc.data();
+        if (!user || !user.hashedPassword) return null;
 
         const isValid = await bcrypt.compare(credentials.password, user.hashedPassword);
         if (!isValid) return null;
 
         const cleanUser: AuthUser = {
-          id: doc.id,
+          id: user._id.toString(),
           name: user.name,
           email: user.email,
           role: user.role,

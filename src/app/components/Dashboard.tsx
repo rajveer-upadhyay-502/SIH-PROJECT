@@ -22,22 +22,37 @@ export default function Dashboard() {
   // Redirect to login if not logged in
   useEffect(() => {
     if (!user) {
-      router.push("/");
+      router.push("/login");
     }
   }, [user, router]);
 
   // While redirecting or no user, render nothing
   if (!user) return null;
 
+  // Define nav links with allowed roles
   const navLinks = [
-    { name: "Colleges", href: "/dashboard/colleges", icon: <FaUniversity size={20} /> },
-    { name: "Departments", href: "/dashboard/departments", icon: <FaBuilding size={20} /> },
-    { name: "Add Programs", href: "/dashboard/programs", icon: <FaProjectDiagram size={20} /> },
-    { name: "Add Faculties", href: "/dashboard/faculties", icon: <FaChalkboardTeacher size={20} /> },
-    { name: "Add Students", href: "/dashboard/students", icon: <FaUserGraduate size={20} /> },
-    { name: "Timetable", href: "/dashboard/timetable", icon: <FaCalendarAlt size={20} /> },
-    { name: "Profile", href: "/dashboard/profile", icon: <FaUserCircle size={20} /> },
+    { name: "Colleges", href: "/dashboard/colleges", icon: <FaUniversity size={20} />, roles: ["ADMIN"] },
+    { name: "Departments", href: "/dashboard/departments", icon: <FaBuilding size={20} />, roles: ["ADMIN"] },
+    { name: "Add Programs", href: "/dashboard/programs", icon: <FaProjectDiagram size={20} />, roles: ["ADMIN"] },
+    { name: "Add Faculties", href: "/dashboard/faculties", icon: <FaChalkboardTeacher size={20} />, roles: ["ADMIN"] },
+    { name: "Add Students", href: "/dashboard/students", icon: <FaUserGraduate size={20} />, roles: ["ADMIN", "FACULTY"] },
+    { name: "Timetable", href: "/dashboard/timetable", icon: <FaCalendarAlt size={20} />, roles: ["ADMIN", "FACULTY"] },
+    { name: "Profile", href: "/dashboard/profile", icon: <FaUserCircle size={20} />, roles: ["ADMIN", "FACULTY", "STUDENT"] },
   ];
+
+  // Filter nav links based on user role
+  const filteredNavLinks = navLinks.filter((link) => link.roles.includes(user.role));
+
+  // Cards to show on dashboard overview, filtered by role
+  const cards = [
+    { title: "Add Department", href: "/dashboard/departments", desc: "Create and manage academic departments.", roles: ["ADMIN"] },
+    { title: "Add Programs & Subprograms", href: "/dashboard/programs", desc: "Organize programs under departments.", roles: ["ADMIN"] },
+    { title: "Add Faculty", href: "/dashboard/faculties", desc: "Add and assign teaching staff.", roles: ["ADMIN"] },
+    { title: "Add Students", href: "/dashboard/students", desc: "Enroll new students in programs.", roles: ["ADMIN", "FACULTY"] },
+    { title: "Manage Timetable", href: "/dashboard/timetable", desc: "Generate and modify class schedules.", roles: ["ADMIN", "FACULTY"] },
+  ];
+
+  const filteredCards = cards.filter((card) => card.roles.includes(user.role));
 
   const handleLogout = () => {
     logout();
@@ -48,7 +63,7 @@ export default function Dashboard() {
     <div className="flex min-h-screen bg-gray-900 text-white">
       {/* Sidebar */}
       <aside className="w-16 bg-gray-800 flex flex-col items-center py-4 space-y-4">
-        {navLinks.map(({ name, href, icon }) => (
+        {filteredNavLinks.map(({ name, href, icon }) => (
           <Link
             href={href}
             key={name}
@@ -62,7 +77,7 @@ export default function Dashboard() {
           </Link>
         ))}
 
-        {/* Logout button on sidebar */}
+        {/* Logout button */}
         <button
           onClick={handleLogout}
           className="w-12 h-12 flex items-center justify-center rounded hover:bg-green-700 transition-colors"
@@ -88,11 +103,9 @@ export default function Dashboard() {
         </section>
 
         <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          <Card title="Add Department" href="/dashboard/departments" desc="Create and manage academic departments." />
-          <Card title="Add Programs & Subprograms" href="/dashboard/programs" desc="Organize programs under departments." />
-          <Card title="Add Faculty" href="/dashboard/faculties" desc="Add and assign teaching staff." />
-          <Card title="Add Students" href="/dashboard/students" desc="Enroll new students in programs." />
-          <Card title="Manage Timetable" href="/dashboard/timetable" desc="Generate and modify class schedules." />
+          {filteredCards.map(({ title, desc, href }) => (
+            <Card key={title} title={title} desc={desc} href={href} />
+          ))}
         </section>
       </main>
     </div>

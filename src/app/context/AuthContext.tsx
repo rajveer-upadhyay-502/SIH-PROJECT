@@ -1,12 +1,19 @@
-// app/context/AuthContext.tsx
 "use client";
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
 
+// Add `role` property here
+export type UserRole = "ADMIN" | "FACULTY" | "STUDENT"; // add more roles if needed
+
+// In AuthContext.tsx
+
 interface User {
   name: string;
   email: string;
+  role: string;  // make role required
+  collegeId?: string; // optional if needed
 }
+
 
 interface AuthContextType {
   user: User | null;

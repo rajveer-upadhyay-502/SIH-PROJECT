@@ -1,7 +1,19 @@
-export interface Faculty {
-  id?: string;
-  userId: string; // Reference to users collection
+import mongoose, { Schema, Document, models, model } from "mongoose";
+
+export interface IFaculty extends Document {
+  name: string;
+  email: string;
+  phone: string;
   departmentId: string;
-  subjectExpertise: string[]; // Array of subject IDs
-  createdAt: number;
+  collegeId: string;
 }
+
+const FacultySchema = new Schema<IFaculty>({
+  name: { type: String, required: true },
+  email: { type: String, required: true, unique: true },
+  phone: { type: String },
+  departmentId: { type: String, required: true },
+  collegeId: { type: String, required: true },
+});
+
+export const Faculty = models.Faculty || model<IFaculty>("Faculty", FacultySchema);

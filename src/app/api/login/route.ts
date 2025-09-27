@@ -1,43 +1,45 @@
-import { NextResponse } from "next/server";
-import { db } from "@/app/lib/db";
-import { collection, query, where, getDocs } from "firebase/firestore";
+import { NextRequest, NextResponse } from "next/server";
+import { connectToDatabase } from "@/app/lib/db";
+import { User } from "@/app/lib/models/user";
 import bcrypt from "bcrypt";
 
-export async function POST(request: Request) {
+// POST /api/login
+export async function POST(req: NextRequest) {
   try {
-    const { email, password } = await request.json();
+    await connectToDatabase();
+
+    const body = await req.json();
+    const { email, password } = body;
 
     if (!email || !password) {
-      return NextResponse.json({ error: "Email and password are required." }, { status: 400 });
+      return NextResponse.json({ success: false, message: "Email and password are required" }, { status: 400 });
     }
 
-    const usersRef = collection(db, "users");
-    const q = query(usersRef, where("email", "==", email));
-    const userSnapshot = await getDocs(q);
+    const user = await User.findOne({ email });
 
-    if (userSnapshot.empty) {
-      return NextResponse.json({ error: "Invalid email or password." }, { status: 401 });
+    if (!user) {
+      return NextResponse.json({ success: false, message: "Invalid email or password" }, { status: 401 });
     }
 
-    const userDoc = userSnapshot.docs[0];
-    const user = userDoc.data();
+    const passwordMatch = await bcrypt.compare(password, user.hashedPassword);
 
-    // Check if approved
-    if (user.status !== "approved") {
-      return NextResponse.json({ error: "User not approved by admin yet." }, { status: 403 });
+    if (!passwordMatch) {
+      return NextResponse.json({ success: false, message: "Invalid email or password" }, { status: 401 });
     }
 
-    // Check password
-    const validPassword = await bcrypt.compare(password, user.passwordHash);
-    if (!validPassword) {
-      return NextResponse.json({ error: "Invalid email or password." }, { status: 401 });
-    }
+    // Respond with user data (excluding password)
+    const userData = {
+      id: user._id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      collegeId: user.collegeId,
+    };
 
-    // TODO: Create session or JWT here
+    return NextResponse.json({ success: true, user: userData }, { status: 200 });
 
-    return NextResponse.json({ message: "Login successful", user: { name: user.name, email: user.email, role: user.role } }, { status: 200 });
   } catch (error) {
     console.error("Login error:", error);
-    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+    return NextResponse.json({ success: false, message: "Internal Server Error" }, { status: 500 });
   }
 }

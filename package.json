@@ -6,7 +6,8 @@
     "dev": "next dev --turbopack",
     "build": "next build --turbopack",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "seed-admins": "ts-node -P scripts/tsconfig.scripts.json scripts/seedAdmins.ts"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.10.0",
@@ -19,7 +20,7 @@
     "firebase": "^12.2.1",
     "lucide-react": "^0.544.0",
     "mongodb": "^5.9.2",
-    "mongoose": "^8.18.1",
+    "mongoose": "^8.18.2",
     "motion": "^12.23.12",
     "next": "15.5.3",
     "next-auth": "^4.24.11",
@@ -34,13 +35,14 @@
     "@eslint/eslintrc": "^3",
     "@tailwindcss/postcss": "^4",
     "@types/bcrypt": "^6.0.0",
-    "@types/node": "^20",
+    "@types/node": "^20.19.17",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "15.5.3",
     "prisma": "^6.16.1",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.2"
   }
 }

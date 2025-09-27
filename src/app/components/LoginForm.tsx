@@ -3,11 +3,11 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { useAuth } from "../context/AuthContext"; // ⬅️ make sure this path is correct
+import { useAuth } from "../context/AuthContext"; // Make sure this path is correct
 
 export default function LoginForm() {
   const router = useRouter();
-  const { login } = useAuth(); // ⬅️ Grab login method from context
+  const { login } = useAuth();
 
   const [formData, setFormData] = useState({
     email: "",
@@ -37,19 +37,26 @@ export default function LoginForm() {
 
       const data = await res.json();
 
-      if (res.ok) {
-        // Save user to context + sessionStorage
-        login({ name: data.name || "Admin", email: formData.email });
+      if (res.ok && data.success) {
+        const user = data.user;
+
+        login({
+          name: user.name,
+          email: user.email,
+          role: user.role || "",
+          collegeId: user.collegeId || "",
+        });
 
         setMessage("✅ Login successful!");
+
         setTimeout(() => {
           router.push("/dashboard");
         }, 1000);
       } else {
-        setMessage(`❌ ${data.error || "Invalid credentials."}`);
+        setMessage(`❌ ${data.message || "Invalid credentials"}`);
       }
     } catch (err) {
-      console.error(err);
+      console.error("Login error:", err);
       setMessage("❌ Network error");
     } finally {
       setLoading(false);
@@ -61,7 +68,9 @@ export default function LoginForm() {
       onSubmit={handleSubmit}
       className="max-w-md mx-auto space-y-4 p-6 border border-gray-700 rounded-lg shadow-lg bg-gray-900 text-white"
     >
-      <h2 className="text-2xl font-semibold text-center mb-4  text-green-500 font-serif">Login</h2>
+      <h2 className="text-2xl font-semibold text-center mb-4 text-green-500 font-serif">
+        Login
+      </h2>
 
       <input
         type="email"
