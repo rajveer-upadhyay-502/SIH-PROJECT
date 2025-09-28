@@ -16,15 +16,20 @@ import {
 import { useAuth } from "@/app/context/AuthContext";
 
 export default function Dashboard() {
-  const { user, logout } = useAuth();
+  const { user, logout, loading } = useAuth();
   const router = useRouter();
 
-  // Redirect to login if not logged in
+  // Redirect to login if not logged in, but wait until loading finishes
   useEffect(() => {
-    if (!user) {
+    if (!loading && !user) {
       router.push("/login");
     }
-  }, [user, router]);
+  }, [loading, user, router]);
+
+  // Show loading state while checking auth
+  if (loading) {
+    return <div className="text-white text-center py-20">Loading...</div>;
+  }
 
   // While redirecting or no user, render nothing
   if (!user) return null;

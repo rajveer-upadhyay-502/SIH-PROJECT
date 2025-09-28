@@ -31,9 +31,20 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-gray-900 text-white`}
       >
         <AuthProvider>
-          <NavbarDemo />
-          <main className="min-h-screen p-4">{children}</main>
-          <Footer/>
+          {/* Navbar always on top */}
+          <div className="relative z-16 pointer-events-auto">
+            <NavbarDemo />
+          </div>
+
+          {/* Main content stays above background */}
+          <main className="min-h-screen p-4 relative z-10">
+            {children}
+          </main>
+
+          {/* Footer with highest priority */}
+          <footer className="relative z-20 pointer-events-auto">
+            <Footer />
+          </footer>
         </AuthProvider>
       </body>
     </html>

@@ -49,17 +49,22 @@ export function NavbarDemo() {
                 <NavbarButton variant="secondary" href="/login">
                   Login
                 </NavbarButton>
-                <NavbarButton variant="primary" href="/college">
-                  Register
+                <NavbarButton variant="primary" href="/learn">
+                  Learn More
                 </NavbarButton>
               </>
             ) : (
-              <button
-                onClick={handleLogout}
-                className="bg-white text-black font-bold py-2 px-4 rounded hover:bg-white-700 cursor-pointer"
-              >
-                Logout
-              </button>
+              <>
+                <NavbarButton variant="secondary" href="/dashboard">
+                  Dashboard
+                </NavbarButton>
+                <button
+                  onClick={handleLogout}
+                  className="bg-white text-black font-bold py-2 px-4 rounded hover:bg-white-700 cursor-pointer"
+                >
+                  Logout
+                </button>
+              </>
             )}
           </div>
         </NavBody>
@@ -104,19 +109,29 @@ export function NavbarDemo() {
                     onClick={() => setIsMobileMenuOpen(false)}
                     variant="primary"
                     className="w-full"
-                    href="/college"
+                    href="/learn"
                   >
-                    Register
+                    Learn
                   </NavbarButton>
                 </>
               ) : (
-                <NavbarButton
-                  onClick={handleLogout} 
-                  variant="primary"
-                  className="w-full"
-                >
-                  Logout
-                </NavbarButton>
+                <>
+                  <NavbarButton
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    variant="secondary"
+                    className="w-full"
+                    href="/dashboard"
+                  >
+                    Dashboard
+                  </NavbarButton>
+                  <NavbarButton
+                    onClick={handleLogout}
+                    variant="primary"
+                    className="w-full"
+                  >
+                    Logout
+                  </NavbarButton>
+                </>
               )}
             </div>
           </MobileNavMenu>
