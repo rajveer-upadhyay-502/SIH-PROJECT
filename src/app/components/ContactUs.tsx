@@ -1,11 +1,43 @@
 'use client';
-import React from 'react';
+import React, { useState } from 'react';
 
 const ContactUs: React.FC = () => {
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const [message, setMessage] = useState('');
+  const [isError, setIsError] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    // Add your submission logic here (e.g., API call, toast, etc.)
-    alert('Form submitted!');
+
+    const form = e.currentTarget;
+    const formData = new FormData(form);
+
+    const name = formData.get('name') as string;
+    const email = formData.get('email') as string;
+    const userMessage = formData.get('message') as string;
+
+    setMessage(''); // Clear any previous message
+
+    try {
+      const res = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, message: userMessage }),
+      });
+
+      if (res.ok) {
+        setIsError(false);
+        setMessage('✅ Message sent successfully!');
+        form.reset();
+      } else {
+        const error = await res.json();
+        setIsError(true);
+        setMessage(`❌ ${error.error || 'Failed to send message.'}`);
+      }
+    } catch (err) {
+      console.error('Form submission error:', err);
+      setIsError(true);
+      setMessage('❌ Something went wrong. Please try again.');
+    }
   };
 
   return (
@@ -39,10 +71,20 @@ const ContactUs: React.FC = () => {
         />
         <button
           type="submit"
-          className="bg-green-600 hover:bg-green-700 text-white font-medium py-3 px-6 rounded-md transition-colors duration-300"
+          className="bg-green-600 hover:bg-green-700 text-white font-medium py-3 px-6 rounded-md transition-colors duration-300 cursor-pointer"
         >
           Send Message
         </button>
+
+        {message && (
+          <div
+            className={`mt-4 text-sm font-medium ${
+              isError ? 'text-red-600' : 'text-green-600'
+            }`}
+          >
+            {message}
+          </div>
+        )}
       </form>
     </div>
   );
