@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
 import React, { useEffect } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import {
   FaUniversity,
   FaBuilding,
@@ -18,26 +18,23 @@ import { useAuth } from "@/app/context/AuthContext";
 export default function Dashboard() {
   const { user, logout, loading } = useAuth();
   const router = useRouter();
+  const pathname = usePathname();
 
-  // Redirect to login if not logged in, but wait until loading finishes
   useEffect(() => {
     if (!loading && !user) {
       router.push("/login");
     }
   }, [loading, user, router]);
 
-  // Show loading state while checking auth
   if (loading) {
     return <div className="text-white text-center py-20">Loading...</div>;
   }
 
-  // While redirecting or no user, render nothing
   if (!user) return null;
 
-  // Define nav links with allowed roles
   const navLinks = [
-    { name: "Colleges", href: "/dashboard/colleges", icon: <FaUniversity size={20} />, roles: ["ADMIN"] },
-    { name: "Departments", href: "/dashboard/departments", icon: <FaBuilding size={20} />, roles: ["ADMIN"] },
+    { name: "Add College", href: "/dashboard/college", icon: <FaUniversity size={20} />, roles: ["ADMIN"] },
+    { name: "Add Departments", href: "/dashboard/departments", icon: <FaBuilding size={20} />, roles: ["ADMIN"] },
     { name: "Add Programs", href: "/dashboard/programs", icon: <FaProjectDiagram size={20} />, roles: ["ADMIN"] },
     { name: "Add Faculties", href: "/dashboard/faculties", icon: <FaChalkboardTeacher size={20} />, roles: ["ADMIN"] },
     { name: "Add Students", href: "/dashboard/students", icon: <FaUserGraduate size={20} />, roles: ["ADMIN", "FACULTY"] },
@@ -45,10 +42,8 @@ export default function Dashboard() {
     { name: "Profile", href: "/dashboard/profile", icon: <FaUserCircle size={20} />, roles: ["ADMIN", "FACULTY", "STUDENT"] },
   ];
 
-  // Filter nav links based on user role
-  const filteredNavLinks = navLinks.filter((link) => link.roles.includes(user.role));
+  const filteredNavLinks = navLinks.filter(link => link.roles.includes(user.role));
 
-  // Cards to show on dashboard overview, filtered by role
   const cards = [
     { title: "Add Department", href: "/dashboard/departments", desc: "Create and manage academic departments.", roles: ["ADMIN"] },
     { title: "Add Programs & Subprograms", href: "/dashboard/programs", desc: "Organize programs under departments.", roles: ["ADMIN"] },
@@ -57,7 +52,7 @@ export default function Dashboard() {
     { title: "Manage Timetable", href: "/dashboard/timetable", desc: "Generate and modify class schedules.", roles: ["ADMIN", "FACULTY"] },
   ];
 
-  const filteredCards = cards.filter((card) => card.roles.includes(user.role));
+  const filteredCards = cards.filter(card => card.roles.includes(user.role));
 
   const handleLogout = () => {
     logout();
@@ -72,7 +67,9 @@ export default function Dashboard() {
           <Link
             href={href}
             key={name}
-            className="group flex items-center justify-center w-12 h-12 rounded hover:bg-green-600 transition-colors relative"
+            className={`group flex items-center justify-center w-12 h-12 rounded transition-colors relative ${
+              pathname === href ? "bg-green-700" : "hover:bg-green-600"
+            }`}
             aria-label={name}
           >
             {icon}
@@ -94,7 +91,7 @@ export default function Dashboard() {
 
       {/* Main content */}
       <main className="flex-grow p-8 pt-20">
-        <h2 className="text-3xl font-semibold mb-6">Admin Dashboard</h2>
+        <h2 className="text-3xl font-semibold mb-6">{user.role} Dashboard</h2>
 
         <div className="text-green-400 mb-4">
           Welcome, <strong>{user.name}</strong>!
@@ -123,7 +120,7 @@ function Card({ title, desc, href }: { title: string; desc: string; href: string
       <h4 className="text-lg font-semibold mb-2">{title}</h4>
       <p className="text-gray-300">{desc}</p>
       <Link href={href} className="text-green-400 mt-2 inline-block">
-        Go to {title.split(" ")[1]} →
+        Go to {title.split(" ").slice(1).join(" ")} →
       </Link>
     </div>
   );

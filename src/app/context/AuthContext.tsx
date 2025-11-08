@@ -1,25 +1,18 @@
 "use client";
 
-import React, {
-  createContext,
-  useContext,
-  useState,
-  useEffect,
-  ReactNode,
-} from "react";
+import { createContext, useContext, useState, useEffect } from "react";
+import type { ReactNode } from "react";
 
-// Define allowed roles
 export type UserRole = "ADMIN" | "FACULTY" | "STUDENT";
 
-// Define user type
 interface User {
+  _id: string;
   name: string;
   email: string;
   role: UserRole;
   collegeId?: string;
 }
 
-// Define context shape
 interface AuthContextType {
   user: User | null;
   login: (userData: User) => void;
@@ -27,38 +20,29 @@ interface AuthContextType {
   loading: boolean;
 }
 
-// Create context
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// Provider
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const storedUser = sessionStorage.getItem("user");
-
+    // Load user from localStorage (replace with real auth mechanism)
+    const storedUser = localStorage.getItem("user");
     if (storedUser) {
-      try {
-        const parsedUser = JSON.parse(storedUser);
-        setUser(parsedUser);
-      } catch (err) {
-        console.error("Failed to parse stored user:", err);
-        sessionStorage.removeItem("user");
-      }
+      setUser(JSON.parse(storedUser));
     }
-
     setLoading(false);
   }, []);
 
   const login = (userData: User) => {
     setUser(userData);
-    sessionStorage.setItem("user", JSON.stringify(userData));
+    localStorage.setItem("user", JSON.stringify(userData));
   };
 
   const logout = () => {
     setUser(null);
-    sessionStorage.removeItem("user");
+    localStorage.removeItem("user");
   };
 
   return (
@@ -68,10 +52,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   );
 }
 
-// Hook
 export function useAuth(): AuthContextType {
   const context = useContext(AuthContext);
-  if (!context) {
+  if (context === undefined) {
     throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;

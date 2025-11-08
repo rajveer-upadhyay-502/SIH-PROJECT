@@ -1,9 +1,10 @@
+// app/api/login/route.ts or wherever your API login is
+
 import { NextRequest, NextResponse } from "next/server";
 import { connectToDatabase } from "@/app/lib/db";
 import { User } from "@/app/lib/models/user";
 import bcrypt from "bcrypt";
 
-// POST /api/login
 export async function POST(req: NextRequest) {
   try {
     await connectToDatabase();
@@ -27,9 +28,9 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ success: false, message: "Invalid email or password" }, { status: 401 });
     }
 
-    // Respond with user data (excluding password)
+    // Return user with _id (not id)
     const userData = {
-      id: user._id,
+      _id: user._id.toString(),  // Make sure _id is string
       name: user.name,
       email: user.email,
       role: user.role,

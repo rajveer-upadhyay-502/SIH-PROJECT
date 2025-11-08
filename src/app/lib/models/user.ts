@@ -5,6 +5,7 @@ import mongoose, { Schema, Document, models, model } from "mongoose";
 export type UserRole = "ADMIN" | "FACULTY" | "STUDENT";
 
 export interface IUser extends Document {
+    _id: string;
   name: string;
   email: string;
   hashedPassword: string;
