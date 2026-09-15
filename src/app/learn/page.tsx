@@ -35,9 +35,15 @@ export default function LearnPage() {
   // Fetch feedbacks on mount
   useEffect(() => {
     fetch("/api/feedback")
-      .then((res) => res.json())
+      .then(async (res) => {
+        const data = await res.json();
+        if (!res.ok) {
+          throw new Error(data.error || "Failed to load feedbacks");
+        }
+        return data;
+      })
       .then((data) => setFeedbacks(data))
-      .catch(() => setMessage("Failed to load feedbacks"));
+      .catch((error: Error) => setMessage(error.message));
   }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {

@@ -8,6 +8,7 @@ export async function GET() {
     const feedbacks = await Feedback.find().sort({ createdAt: -1 }).lean();
     return NextResponse.json(feedbacks, { status: 200 });
   } catch (error) {
+    console.error("Failed to fetch feedbacks:", error);
     return NextResponse.json({ error: "Failed to fetch feedbacks" }, { status: 500 });
   }
 }
@@ -25,6 +26,7 @@ export async function POST(req: Request) {
 
     return NextResponse.json(newFeedback, { status: 201 });
   } catch (error) {
+    console.error("Failed to save feedback:", error);
     return NextResponse.json({ error: "Failed to save feedback" }, { status: 500 });
   }
 }
